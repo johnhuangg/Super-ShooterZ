@@ -1,0 +1,306 @@
+/**
+ * [Player.java]
+ * this is the player class
+ * @author John Huang
+ * @date December 18,2017
+ */
+import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.Random;
+abstract class Player {
+ //class variables
+ private int x;
+ private int y;
+ private int h;
+ private int w;
+ private int maxHealth;
+ private int currentHealth;
+ private int lives;
+ private Weapon weapon;
+ private String name;
+ private Rectangle boundingBox;
+ private int xdirection,ydirection;
+ private int gravity=1;
+ private int terminalVelocity=100;
+ private int vertSpeed; 
+ private boolean falling;
+ private int currentPlatformY;
+ private String direction;
+ private boolean observe;
+ 
+ /**
+  * Player
+  * constructor for player class, takes in a bunch of variables for the class
+  * @param String name, int x, int y, int health,Weapon weapon, int h, int w
+  */ 
+ Player(String name, int x, int y, int health,Weapon weapon, int h, int w) {
+  this.name = name;
+  this.x = x;
+  this.y = y;
+  this.currentHealth = health;
+  this.maxHealth = this.currentHealth;
+  this.boundingBox=new Rectangle(x, y, w, h);
+  System.out.println(this.boundingBox.getWidth()+" "+this.boundingBox.getHeight()+" "+this.boundingBox.getX()+" "+this.boundingBox.getY());
+  this.weapon = weapon;
+  this.lives = 3;
+  this.falling = true;
+  this.vertSpeed = 0;
+  this.observe = false;
+ }
+  
+ /**
+  * setLives
+  * this set players lives
+  */
+ public void setLives(int lives) {
+  this.lives = lives;
+ }//end of setLives
+ 
+  /**
+   * setX
+   * this sets the x coordinate of the player
+   * @param int x which is the x coordinate
+   */ 
+  public void setX(int x, String direction){
+	  this.boundingBox.setLocation(x, this.y);
+    this.x=x;
+    this.direction = direction;
+  }
+  /**
+   * setY
+   * this sets the y coordinate of the player
+   * @param int y which is the y coordinate
+   */ 
+  public void setY(int y){
+    this.boundingBox.setLocation(this.x, y);
+    this.y=y;
+  }
+
+  /**
+   * setObserve
+   */
+  public void setObserve(boolean observe) {
+	  this.observe = observe;
+	  this.boundingBox.width = 0;
+  }
+ 
+  /**
+   * getLives
+   * this returns players lives
+   */
+  public int getLives() {
+   return this.lives;
+  }//end of getLives
+  
+  /**
+   * getX
+   * this gets the x coordinate of the player
+   * @return int x which is the x coordinate
+   */ 
+  public int getX(){
+    return this.x;
+  }
+  /**
+   * getY
+   * this gets the y coordinate of the player
+   * @return int y which is the y coordinate
+   */ 
+  public int getY(){
+    return this.y;
+  }
+  
+  /**
+   * getDirection
+   * returns players direction
+   */
+  public String getDirection() {
+	  return this.direction;
+  }
+  /**
+   * getObserve
+   */
+  public boolean getObserve() {
+	  return this.observe;
+  }
+  
+  /**
+   * getMaxHealth
+   * this gets the maximum health of the player
+   * @return int maxHealth which is the maxHealth
+   */ 
+  public int getMaxHealth(){
+    return this.maxHealth;
+  }
+  /**
+   * getCurrentHealth
+   * this gets the current health of the player
+   * @return int currentHealth which is the currentHealth
+   */ 
+  public int getCurrentHealth(){
+    return this.currentHealth;
+  }
+  
+  /**
+   * getPlatform
+   * method returns Platform that player is standing on
+   */
+  public int getPlatformY(){
+	  return this.currentPlatformY;
+  }
+  
+  /**
+   * setCurrentHealth
+   * this sets the current health of the player
+   * @param int currentHealth which is the currentHealth
+   */ 
+  public void setCurrentHealth(int currentHealth){
+    this.currentHealth=currentHealth;
+  }
+  
+  /**
+   * setVertSpeed
+   * method that sets the vertical speed
+   */
+  public void setVertSpeed(int vertSpeed) {
+	  this.vertSpeed = vertSpeed;
+  }
+  
+  /**
+   * setWeapon
+   * this sets weapon of the player
+   * @param Weapon weapon which is the weapon
+   */ 
+  public void setWeapon(Weapon weapon){
+    this.weapon=weapon;
+  }
+  
+  public void setFalling(boolean falling) {
+	this.falling = falling;  
+  }
+  
+  /**
+   * getWeapon
+   * this gets the weapon of the player
+   * @return Weapon weapon which is the weapon
+   */ 
+  public Weapon weapon(){
+    return this.weapon;
+  }
+  
+  /**
+   * getName
+   * this gets the name of the player
+   * @return String name 
+   */
+  public String getName() {
+   return this.name;
+  }
+  
+  /**
+   * getVertSpeed
+   */
+  public int getVertSpeed() {
+   return this.vertSpeed;
+  }
+  /**
+   * fire
+   * this is empty method for overriding
+   */
+  public void fire(int x, int y, Client client) {
+   
+  }
+  
+  public void drawBoundingBox(Graphics g) {
+	  g.setColor(Color.blue);
+	  g.fillRect((int)this.boundingBox.getX(), (int)this.boundingBox.getY(),
+			  (int)this.boundingBox.getWidth(), (int)this.boundingBox.getHeight());
+  }
+  
+  /**
+   * checkShot
+   * checks if Player has been hit with a bullet object
+   * @params Rectangle
+   * returns boolean
+   */
+  public boolean checkShot(Bullet bullet) {
+   if(bullet.getBoundingBox().intersects(boundingBox)) {
+    return true;
+  }
+  return false;
+ }// end of check
+
+ /**
+  * fall this is method to make the player fall
+  */
+ public void fall() {
+  this.vertSpeed = this.vertSpeed + gravity;
+  if (this.vertSpeed > terminalVelocity) {
+   this.vertSpeed = terminalVelocity;
+  }
+  if (this.falling) {
+   setY(this.y + this.vertSpeed);
+  }
+  
+  /*try {
+   Thread.sleep(20);
+  } catch (Exception e) {
+
+  }*/
+ }
+   
+ /**
+  * collisionDetect this is the collision method
+  */
+ public boolean collisionDetect(Platform[] platforms) {
+  for (int i = 0; i < platforms.length; i++) {
+   if (this.boundingBox.intersects(platforms[i].getRec())) {
+     //System.out.println("collide"+platforms[i].getRec().getX()+" "+platforms[i].getRec().getY()+" "+this.x+" "+this.y);
+     //setY((int) platforms[i].getRec().getY()+h);
+     this.currentPlatformY = (int)platforms[i].getRec().getY();
+     this.falling = false;
+     this.vertSpeed = 0;
+     return false;
+   }else {
+   //  System.out.println("not collide"+platforms[i].getRec().getX()+" "+platforms[i].getRec().getY()+" "+this.x+" "+this.y);
+    this.falling=true;
+   }
+  }
+  //System.out.println(boundingBox.x+" "+boundingBox.y+" "+this.x+" "+this.y);
+  return true;
+ }
+ 
+	/**
+	 * die this is method for when player dies
+	 */
+	public void die() {
+		if (lives > 0) {
+			// reduce player life
+			this.lives = this.lives - 1;
+			System.out.println(lives);
+			// reset player health
+			setCurrentHealth(getMaxHealth());
+			this.vertSpeed = 0;
+		}
+	}
+ 
+  /**
+  * respawn this method respawns the player at a random spawn location
+  */
+ public void respawn(int max, int min,ArrayList<String> startingPos) {
+  // respawn player:
+  // generate a random number between 0 and 3, representing indexes
+  Random rand = new Random();
+  int randNum = rand.nextInt(max - min + 1) + min;
+  // max -= 1; //subtract one from max since startingPos ArrayList size will
+  // shrink
+  // temporary value
+  String coords = startingPos.get(randNum);
+  int tempX = Integer.parseInt(coords.substring(0, coords.indexOf(" ")));
+  int tempY = Integer.parseInt(coords.substring(coords.indexOf(" ") + 1));
+  // set coordinates of player to respawn location
+  this.x = tempX;
+  this.y = tempY;
+ }
+}
